@@ -6,22 +6,42 @@ import "./App.css";
 function App() {
   const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [weather, setWeather] = useState(null);
 
   const handleSearch = async () => {
+    setMessage("");
+    setWeather(null); // Clear previous weather data
     const trimmedCity = city.trim(); //to remove leading and trailing whitespace
 
     if (!trimmedCity) {
-      setMessage("Please enter a city name");
+      setErrorMsg("Please enter a city name");
       return;
     }
 
     try {
-      setMessage(`Searching weather for "${trimmedCity}"...`);
+      setErrorMsg(`Searching weather for "${trimmedCity}"...`);
 
       const data = await getWeatherByCity(trimmedCity); //fetch weather data for the specified city
+      setErrorMsg(""); // Clear any previous error messages
+
+      const current = data.current_condition?.[0]; // Get the current condition from the API response
+      const nearestArea = data.nearest_area?.[0]; // Get the nearest area information from the API response
+
+      const weatherData = {
+        city: nearestArea?.areaName?.[0]?.value || trimmedCity,
+        country: nearestArea?.country?.[0]?.value || "",
+        temperature: current?.temp_C || "N/A",
+        condition: current?.weatherDesc?.[0]?.value || "N/A",
+        humidity: current?.humidity || "N/A",
+        windSpeed: current?.windspeedKmph || "N/A",
+      };
 
       console.log(data);
-      setMessage(`Weather data loaded for "${trimmedCity}". Check console.`);
+      setWeather(weatherData);
+      setMessage(`Weather data loaded for "${weatherData.city}".`);
+
+      // setMessage(`Weather data loaded for "${trimmedCity}". Check console.`);
     } catch (error) {
       setMessage(error.message);
     }
@@ -61,24 +81,54 @@ function App() {
                 Search
               </button>
             </div>
-            <p className="text-red-400 text-sm mt-2">{`${message}`}</p>
+            <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
           </div>
 
-          <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
+          {/* <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
             Current input: {city || "Nothing typed yet"}
-          </div>
+          </div> */}
+
+          {message && (
+            <div className="mb-6 rounded-xl bg-white p-4 text-sm font-medium text-sky-700 shadow-md">
+              {message}
+            </div>
+          )}
 
           <div className="mb-6 rounded-2xl bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-semibold text-sky-800">
               Weather Information
             </h2>
-            <div className="space-y-2 text-gray-700">
-              <p>City: --</p>
-              <p>Temperature: --</p>
-              <p>Condition: --</p>
-              <p>Humidity: --</p>
-              <p>Wind Speed: --</p>
-            </div>
+            {weather ? (
+              <div className="space-y-2 text-gray-700">
+                <p>
+                  <span className="font-medium">City:</span> {weather.city}
+                </p>
+                <p>
+                  <span className="font-medium">Country:</span>{" "}
+                  {weather.country}
+                </p>
+                <p>
+                  <span className="font-medium">Temperature:</span>{" "}
+                  {weather.temperature}°C
+                </p>
+                <p>
+                  <span className="font-medium">Condition:</span>{" "}
+                  {weather.condition}
+                </p>
+                <p>
+                  <span className="font-medium">Humidity:</span>{" "}
+                  {weather.humidity}%
+                </p>
+                <p>
+                  <span className="font-medium">Wind Speed:</span>{" "}
+                  {weather.windSpeed} km/h
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-500">
+                No weather data yet. Search for a city.
+              </p>
+            )}
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-md">
