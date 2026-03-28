@@ -8,11 +8,14 @@ function App() {
   const [message, setMessage] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [weather, setWeather] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async () => {
-    setMessage("");
-    setWeather(null); // Clear previous weather data
     const trimmedCity = city.trim(); //to remove leading and trailing whitespace
+
+    setMessage(""); // Clear any previous success messages
+    setErrorMsg(""); // Clear any previous error messages
+    setWeather(null); // Clear previous weather data
 
     if (!trimmedCity) {
       setErrorMsg("Please enter a city name");
@@ -20,6 +23,7 @@ function App() {
     }
 
     try {
+      setIsLoading(true);
       setErrorMsg(`Searching weather for "${trimmedCity}"...`);
 
       const data = await getWeatherByCity(trimmedCity); //fetch weather data for the specified city
@@ -27,6 +31,10 @@ function App() {
 
       const current = data.current_condition?.[0]; // Get the current condition from the API response
       const nearestArea = data.nearest_area?.[0]; // Get the nearest area information from the API response
+
+      if (!current || !nearestArea) {
+        throw new Error("Weather data is unavailable for this city.");
+      }
 
       const weatherData = {
         city: nearestArea?.areaName?.[0]?.value || trimmedCity,
@@ -38,18 +46,25 @@ function App() {
       };
 
       console.log(data);
-      setWeather(weatherData);
-      setMessage(`Weather data loaded for "${weatherData.city}".`);
 
-      // setMessage(`Weather data loaded for "${trimmedCity}". Check console.`);
+      setCity(""); // Clear the input field after search
+      setWeather(weatherData);
+      setMessage(
+        `Weather data loaded for "${weatherData.city}". Check console for details.`,
+      );
     } catch (error) {
-      setMessage(error.message);
+      setWeather(null);
+      setMessage(
+        error.message || "Something went wrong while fetching weather data.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Handle "Enter" key press in the input field to trigger search
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isLoading) {
       handleSearch();
     }
   };
@@ -70,15 +85,25 @@ function App() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 rounded-xl border border-sky-200 px-4 py-3 outline-none focus:border-sky-500"
+                disabled={isLoading}
+                className={`flex-1 rounded-xl border px-4 py-3 outline-none  ${
+                  isLoading
+                    ? "bg-gray-100 cursor-not-allowed text-gray-400"
+                    : "border-sky-200 focus:border-sky-500"
+                }`}
               />
 
               <button
                 type="button"
                 onClick={handleSearch}
-                className="rounded-xl bg-sky-600 px-5 py-3 font-medium text-white transition hover:bg-sky-700"
+                disabled={isLoading}
+                className={`rounded-xl px-5 py-3 font-medium text-white transition ${
+                  isLoading
+                    ? "cursor-not-allowed bg-sky-400"
+                    : "cursor-pointer bg-sky-600 hover:bg-sky-700"
+                }`}
               >
-                Search
+                {isLoading ? "Loading..." : "Search"}
               </button>
             </div>
             <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
