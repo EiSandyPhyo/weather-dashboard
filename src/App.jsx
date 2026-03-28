@@ -1,9 +1,38 @@
-// eslint-disable no-unused-vars 
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
+import { getWeatherByCity } from "./api";
 import "./App.css";
 
 function App() {
   const [city, setCity] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSearch = async () => {
+    const trimmedCity = city.trim(); //to remove leading and trailing whitespace
+
+    if (!trimmedCity) {
+      setMessage("Please enter a city name");
+      return;
+    }
+
+    try {
+      setMessage(`Searching weather for "${trimmedCity}"...`);
+
+      const data = await getWeatherByCity(trimmedCity); //fetch weather data for the specified city
+
+      console.log(data);
+      setMessage(`Weather data loaded for "${trimmedCity}". Check console.`);
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
+
+  // Handle "Enter" key press in the input field to trigger search
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <>
@@ -20,12 +49,19 @@ function App() {
                 placeholder="Enter city name..."
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="flex-1 rounded-xl border border-sky-200 px-4 py-3 outline-none focus:border-sky-500"
               />
-              <button className="rounded-xl bg-sky-600 px-5 py-3 font-medium text-white transition hover:bg-sky-700">
+
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="rounded-xl bg-sky-600 px-5 py-3 font-medium text-white transition hover:bg-sky-700"
+              >
                 Search
               </button>
             </div>
+            <p className="text-red-400 text-sm mt-2">{`${message}`}</p>
           </div>
 
           <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
