@@ -1,6 +1,10 @@
+// eslint-disable no-unused-vars 
+import { useState } from "react";
 import "./App.css";
 
 function App() {
+  const [city, setCity] = useState("");
+
   return (
     <>
       <div className="min-h-screen bg-sky-100 px-4 py-10">
@@ -14,12 +18,18 @@ function App() {
               <input
                 type="text"
                 placeholder="Enter city name..."
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 className="flex-1 rounded-xl border border-sky-200 px-4 py-3 outline-none focus:border-sky-500"
               />
               <button className="rounded-xl bg-sky-600 px-5 py-3 font-medium text-white transition hover:bg-sky-700">
                 Search
               </button>
             </div>
+          </div>
+
+          <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
+            Current input: {city || "Nothing typed yet"}
           </div>
 
           <div className="mb-6 rounded-2xl bg-white p-6 shadow-md">
