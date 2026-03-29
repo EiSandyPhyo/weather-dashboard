@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { getWeatherByCity } from "./api";
-import "./App.css";
+import SearchBar from "./components/SearchBar";
+import WeatherCard from "./components/WeatherCard";
+import FavoriteLists from "./components/FavoriteLists";
 
 function App() {
   const [city, setCity] = useState("");
@@ -87,7 +89,7 @@ function App() {
       return;
     }
 
-    const updatedFavorites = [...favorites, cityName];
+    const updatedFavorites = [...favorites, cityName]; //add the new city to the existing favorites list
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
     setMessage(`${cityName} added to favorite lists.`);
@@ -107,7 +109,6 @@ function App() {
 
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
-
     setMessage(`${cityToRemove} is removed from favorite lists.`);
   };
 
@@ -119,37 +120,14 @@ function App() {
             weather dashboard
           </h1>
 
-          <div className="mb-6 rounded-2xl bg-white p-4 shadow-md">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                type="text"
-                placeholder="Enter city name..."
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isLoading}
-                className={`flex-1 rounded-xl border px-4 py-3 outline-none  ${
-                  isLoading
-                    ? "bg-gray-100 cursor-not-allowed text-gray-400"
-                    : "border-sky-200 focus:border-sky-500"
-                }`}
-              />
-
-              <button
-                type="button"
-                onClick={handleSearch}
-                disabled={isLoading}
-                className={`rounded-xl px-5 py-3 font-medium text-white transition ${
-                  isLoading
-                    ? "cursor-not-allowed bg-sky-400"
-                    : "cursor-pointer bg-sky-600 hover:bg-sky-700"
-                }`}
-              >
-                {isLoading ? "Loading..." : "Search"}
-              </button>
-            </div>
-            <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
-          </div>
+          <SearchBar
+            city={city}
+            setCity={setCity}
+            handleKeyDown={handleKeyDown}
+            handleSearch={handleSearch}
+            isLoading={isLoading}
+            errorMsg={errorMsg}
+          />
 
           {/* <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
             Current input: {city || "Nothing typed yet"}
@@ -161,85 +139,16 @@ function App() {
             </div>
           )}
 
-          <div className="mb-6 rounded-2xl bg-white p-6 shadow-md">
-            <h2 className="mb-4 text-2xl font-semibold text-sky-800">
-              Weather Information
-            </h2>
+          <WeatherCard
+            weather={weather}
+            handleAddFavorite={handleAddFavorite}
+          />
 
-            {weather ? (
-              <>
-                <div className="space-y-2 text-gray-700">
-                  <p>
-                    <span className="font-medium">City:</span> {weather.city}
-                  </p>
-                  <p>
-                    <span className="font-medium">Country:</span>{" "}
-                    {weather.country}
-                  </p>
-                  <p>
-                    <span className="font-medium">Temperature:</span>{" "}
-                    {weather.temperature}°C
-                  </p>
-                  <p>
-                    <span className="font-medium">Condition:</span>{" "}
-                    {weather.condition}
-                  </p>
-                  <p>
-                    <span className="font-medium">Humidity:</span>{" "}
-                    {weather.humidity}%
-                  </p>
-                  <p>
-                    <span className="font-medium">Wind Speed:</span>{" "}
-                    {weather.windSpeed} km/h
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddFavorite}
-                  className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-                >
-                  Add to Favorites
-                </button>
-              </>
-            ) : (
-              <p className="text-gray-500">
-                No weather data yet. Search for a city.
-              </p>
-            )}
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <h2 className="mb-4 text-2xl font-semibold text-sky-800 capitalize">
-              favorite cities
-            </h2>
-            {favorites.length > 0 ? (
-              <ul className="space-y-2 text-gray-700">
-                {favorites.map((favoriteCity, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center justify-between rounded-lg bg-sky-50 px-3 py-2 hover:bg-sky-100 transition"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleSearch(favoriteCity)}
-                      className="text-left font-medium text-sky-700 hover:italic cursor-pointer hover:text-sky-800 hover:text-xl transition-all"
-                    >
-                      {favoriteCity}
-                    </button>
-
-                    <button
-                      onClick={() => handleRemoveFavorite(favoriteCity)}
-                      className="rounded-md bg-red-500 px-3 py-1 text-sm text-white cursor-pointer hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No favorite cities yet.</p>
-            )}
-          </div>
+          <FavoriteLists
+            favorites={favorites}
+            handleSearch={handleSearch}
+            handleRemoveFavorite={handleRemoveFavorite}
+          />
         </div>
       </div>
     </>
