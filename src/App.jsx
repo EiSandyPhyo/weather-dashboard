@@ -17,8 +17,8 @@ function App() {
     setFavorites(savedFavorites);
   }, []);
 
-  const handleSearch = async () => {
-    const trimmedCity = city.trim(); //to remove leading and trailing whitespace
+  const handleSearch = async (searchCity) => {
+    const trimmedCity = (searchCity || city).trim(); //.trim to remove leading and trailing whitespace
 
     setMessage(""); // Clear any previous success messages
     setErrorMsg(""); // Clear any previous error messages
@@ -54,8 +54,8 @@ function App() {
 
       console.log(data);
 
-      setCity(""); // Clear the input field after search
       setWeather(weatherData);
+      setCity(weatherData.city); // display the city name by clicking the favorite city button
       setMessage(
         `Weather data loaded for "${weatherData.city}". Check console for details.`,
       );
@@ -217,9 +217,15 @@ function App() {
                 {favorites.map((favoriteCity, index) => (
                   <li
                     key={index}
-                    className="flex items-center justify-between rounded-lg bg-sky-50 px-3 py-2"
+                    className="flex items-center justify-between rounded-lg bg-sky-50 px-3 py-2 hover:bg-sky-100 transition"
                   >
-                    <span>{favoriteCity}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleSearch(favoriteCity)}
+                      className="text-left font-medium text-sky-700 hover:italic cursor-pointer hover:text-sky-800 hover:text-xl transition-all"
+                    >
+                      {favoriteCity}
+                    </button>
 
                     <button
                       onClick={() => handleRemoveFavorite(favoriteCity)}
