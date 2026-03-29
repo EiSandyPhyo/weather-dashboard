@@ -101,6 +101,8 @@ function App() {
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
     setMessage(`${cityToRemove} is removed from favorite lists.`);
+    setCity("");
+    setWeather(null);
   };
 
   // Handle fetching weather data for the user's current location

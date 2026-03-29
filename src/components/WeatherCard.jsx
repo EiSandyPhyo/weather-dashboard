@@ -4,53 +4,62 @@ import { getWeatherIcon } from "../api";
 
 const WeatherCard = ({ weather, handleAddFavorite }) => {
   return (
-    <div className="mb-6 rounded-2xl bg-white p-6 shadow-md">
-      <h2 className="mb-4 text-2xl font-semibold text-sky-800">
-        Weather Information
-      </h2>
+    <div className="mb-6 rounded-3xl bg-white p-6 shadow-lg">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-2xl font-semibold text-sky-800">
+          Weather Information
+        </h2>
+
+        <button
+          type="button"
+          onClick={handleAddFavorite}
+          disabled={!weather}
+          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 cursor-pointer disabled:cursor-not-allowed  "
+        >
+          Add to Favorite
+        </button>
+      </div>
 
       {weather ? (
-        <>
-          <div className="space-y-4 text-gray-700">
-            <div className="flex items-center justify-between rounded-2xl bg-sky-50 p-4">
-              
+        <div className="space-y-5">
+          <div className="rounded-3xl bg-linear-to-r from-sky-500 to-cyan-400 p-5 text-white">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-lg font-semibold text-sky-800">
-                  {weather.city}, {weather.country}
+                <p className="text-lg font-semibold">
+                  {weather.city}{weather.country ? `, ${weather.country}` : ''}
                 </p>
-                <p className="mt-1 inline-block rounded-full bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">
+
+                <p className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
                   {weather.condition}
+                </p>
+
+                <p className="mt-4 text-5xl font-bold">
+                  {weather.temperature}°C
                 </p>
               </div>
 
-              <div className="text-5xl">
+              <div className="text-6xl">
                 {getWeatherIcon(weather.weatherCode)}
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <p>
-                <span className="font-medium">Temperature:</span>{" "}
-                {weather.temperature}°C
-              </p>
-              <p>
-                <span className="font-medium">Humidity:</span>{" "}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-sky-50 p-4">
+              <p className="text-sm font-medium text-sky-700">Humidity</p>
+              <p className="mt-2 text-2xl font-bold text-sky-900">
                 {weather.humidity}%
               </p>
-              <p>
-                <span className="font-medium">Wind Speed:</span>{" "}
+            </div>
+
+            <div className="rounded-2xl bg-sky-50 p-4">
+              <p className="text-sm font-medium text-sky-700">Wind Speed</p>
+              <p className="mt-2 text-2xl font-bold text-sky-900">
                 {weather.windSpeed} km/h
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleAddFavorite}
-            className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 cursor-pointer"
-          >
-            Add to Favorites
-          </button>
-        </>
+        </div>
       ) : (
         <p className="text-gray-500">No weather data yet. Search for a city.</p>
       )}
