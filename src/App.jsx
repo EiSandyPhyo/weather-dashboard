@@ -126,6 +126,7 @@ function App() {
             condition: getWeatherCondition(data.weatherCode),
             humidity: data.humidity,
             windSpeed: data.windSpeed,
+            weatherCode: data.weatherCode,
           };
           console.log(weatherData);
           setWeather(weatherData);
