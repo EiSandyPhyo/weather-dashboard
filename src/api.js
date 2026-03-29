@@ -1,4 +1,4 @@
-export async function getWeatherByCity(city) {
+/* export async function getWeatherByCity(city) {
   const response = await fetch(`https://wttr.in/${city}?format=j1`)
 
   if (!response.ok) {
@@ -7,4 +7,104 @@ export async function getWeatherByCity(city) {
 
   const data = await response.json()
   return data
+} */
+
+const GEOCODING_BASE_URL = "https://geocoding-api.open-meteo.com/v1/search"; //city -> coordinates(lat/long)
+const WEATHER_BASE_URL = "https://api.open-meteo.com/v1/forecast"; //coordinates(lat/long) -> weather data
+
+// Function to fetch weather data based on city name - user input
+export async function getWeatherByCity(city) {
+  const geoResponse = await fetch(
+    `${GEOCODING_BASE_URL}?name=${encodeURIComponent(city)}&count=1&language=en&format=json`,
+  ); //count=1 - the number of search only first result to return
+
+  if (!geoResponse.ok) {
+    throw new Error("Failed to search for the city.");
+  }
+
+  const geoData = await geoResponse.json(); //API response -> JSON object
+
+  if (!geoData.results || geoData.results.length === 0) {
+    throw new Error("City not found.");
+  }
+
+  const location = geoData.results[0];
+  const { latitude, longitude, name, country } = location;
+
+  console.log("Geocoding result from api.js:", location); // Log the geocoding result for debugging
+
+  const weatherResponse = await fetch(
+    `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+  );
+
+  if (!weatherResponse.ok) {
+    throw new Error("Failed to fetch weather data.");
+  }
+
+  const weatherData = await weatherResponse.json();
+
+  return {
+    city: name,
+    country,
+    temperature: weatherData.current?.temperature_2m ?? "N/A",
+    humidity: weatherData.current?.relative_humidity_2m ?? "N/A",
+    windSpeed: weatherData.current?.wind_speed_10m ?? "N/A",
+    weatherCode: weatherData.current?.weather_code ?? null,
+  };
+}
+
+export async function getWeatherByCoords(latitude, longitude) {
+  const weatherResponse = await fetch(
+    `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+  );
+
+  if (!weatherResponse.ok) {
+    throw new Error("Failed to fetch weather data for your location.");
+  }
+
+  const weatherData = await weatherResponse.json();
+  console.table(weatherData);
+  return {
+    city: weatherData.city ?? "Unknown location",
+    country: "",
+    temperature: weatherData.current?.temperature_2m ?? "N/A",
+    humidity: weatherData.current?.relative_humidity_2m ?? "N/A",
+    windSpeed: weatherData.current?.wind_speed_10m ?? "N/A",
+    weatherCode: weatherData.current?.weather_code ?? null,
+  };
+}
+
+export function getWeatherCondition(weatherCode) {
+  const weatherMap = {
+    0: "Clear sky",
+    1: "Mainly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing rime fog",
+    51: "Light drizzle",
+    53: "Moderate drizzle",
+    55: "Dense drizzle",
+    56: "Light freezing drizzle",
+    57: "Dense freezing drizzle",
+    61: "Slight rain",
+    63: "Moderate rain",
+    65: "Heavy rain",
+    66: "Light freezing rain",
+    67: "Heavy freezing rain",
+    71: "Slight snow fall",
+    73: "Moderate snow fall",
+    75: "Heavy snow fall",
+    77: "Snow grains",
+    80: "Slight rain showers",
+    81: "Moderate rain showers",
+    82: "Violent rain showers",
+    85: "Slight snow showers",
+    86: "Heavy snow showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with slight hail",
+    99: "Thunderstorm with heavy hail",
+  };
+
+  return weatherMap[weatherCode] || "Unknown condition";
 }

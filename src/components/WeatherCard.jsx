@@ -31,6 +31,11 @@ const WeatherCard = ({ weather, handleAddFavorite }) => {
               <span className="font-medium">Wind Speed:</span>{" "}
               {weather.windSpeed} km/h
             </p>
+            <p>
+              <span className="font-medium">Weather Code:</span>{" "}
+              {weather.weatherCode}
+            </p>
+
           </div>
           <button
             type="button"

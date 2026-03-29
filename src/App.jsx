@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
-import { getWeatherByCity } from "./api";
+import {
+  getWeatherByCity,
+  getWeatherByCoords,
+  getWeatherCondition,
+} from "./api";
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
 import FavoriteLists from "./components/FavoriteLists";
@@ -20,7 +24,7 @@ function App() {
   }, []);
 
   const handleSearch = async (searchCity) => {
-    const trimmedCity = (searchCity || city).trim(); //.trim to remove leading and trailing whitespace
+    const trimmedCity = String(searchCity ?? city).trim(); //.trim to remove leading and trailing whitespace
 
     setMessage(""); // Clear any previous success messages
     setErrorMsg(""); // Clear any previous error messages
@@ -38,23 +42,17 @@ function App() {
       const data = await getWeatherByCity(trimmedCity); //fetch weather data for the specified city
       setErrorMsg(""); // Clear any previous error messages
 
-      const current = data.current_condition?.[0]; // Get the current condition from the API response
-      const nearestArea = data.nearest_area?.[0]; // Get the nearest area information from the API response
-
-      if (!current || !nearestArea) {
-        throw new Error("Weather data is unavailable for this city.");
-      }
-
       const weatherData = {
-        city: nearestArea?.areaName?.[0]?.value || trimmedCity,
-        country: nearestArea?.country?.[0]?.value || "",
-        temperature: current?.temp_C || "N/A",
-        condition: current?.weatherDesc?.[0]?.value || "N/A",
-        humidity: current?.humidity || "N/A",
-        windSpeed: current?.windspeedKmph || "N/A",
+        city: data.city || trimmedCity,
+        country: data.country || "",
+        temperature: data.temperature ?? "N/A",
+        condition: getWeatherCondition(data.weatherCode) || "N/A",
+        humidity: data.humidity ?? "N/A",
+        windSpeed: data.windSpeed ?? "N/A",
+        weatherCode: data.weatherCode ?? null,
       };
 
-      console.log(data);
+      console.log("Weather data:", weatherData);
 
       setWeather(weatherData);
       setCity(weatherData.city); // display the city name by clicking the favorite city button
@@ -68,13 +66,6 @@ function App() {
       );
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Handle "Enter" key press in the input field to trigger search
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isLoading) {
-      handleSearch();
     }
   };
 
@@ -112,6 +103,71 @@ function App() {
     setMessage(`${cityToRemove} is removed from favorite lists.`);
   };
 
+  // Handle fetching weather data for the user's current location
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setMessage("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage("Getting your current location...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const data = await getWeatherByCoords(latitude, longitude);
+
+          const weatherData = {
+            city: "Current Location",
+            country: data.country,
+            temperature: data.temperature,
+            condition: getWeatherCondition(data.weatherCode),
+            humidity: data.humidity,
+            windSpeed: data.windSpeed,
+          };
+          console.log(weatherData);
+          setWeather(weatherData);
+          setCity("");
+          setMessage("Weather data loaded for your current location.");
+        } catch (error) {
+          setWeather(null);
+          setMessage(
+            error.message || "Failed to fetch weather for your location.",
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      (error) => {
+        setIsLoading(false);
+
+        if (error.code === 1) {
+          setMessage("Location permission was denied.");
+        } else if (error.code === 2) {
+          setMessage("Unable to detect your location.");
+        } else if (error.code === 3) {
+          setMessage("Location request timed out.");
+        } else {
+          setMessage("Failed to get your location.");
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
+  };
+
+  // Handle "Enter" key press in the input field to trigger search
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !isLoading) {
+      handleSearch(city);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-sky-100 px-4 py-10">
@@ -127,6 +183,7 @@ function App() {
             handleSearch={handleSearch}
             isLoading={isLoading}
             errorMsg={errorMsg}
+            handleUseCurrentLocation={handleUseCurrentLocation}
           />
 
           {/* <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
