@@ -124,7 +124,7 @@ function App() {
           const data = await getWeatherByCoords(latitude, longitude);
 
           const weatherData = {
-            city: "Current Location",
+            city: data.city.replace("City of ", ""), // Remove "City of " prefix if it exists
             country: data.country,
             temperature: data.temperature,
             condition: getWeatherCondition(data.weatherCode),
@@ -134,7 +134,7 @@ function App() {
           };
           console.log(weatherData);
           setWeather(weatherData);
-          setCity("");
+          setCity(weatherData.city.replace("City of ", "")); // display the city name by clicking the current location button
           setMessage("Weather data loaded for your current location.");
         } catch (error) {
           setWeather(null);

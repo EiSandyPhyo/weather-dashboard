@@ -11,6 +11,8 @@
 
 const GEOCODING_BASE_URL = "https://geocoding-api.open-meteo.com/v1/search"; //city -> coordinates(lat/long)
 const WEATHER_BASE_URL = "https://api.open-meteo.com/v1/forecast"; //coordinates(lat/long) -> weather data
+const REVERSE_GEOCODING_BASE_URL =
+  "https://nominatim.openstreetmap.org/reverse"; //coordinates(lat/long) -> city name
 
 // Function to fetch weather data based on city name - user input
 export async function getWeatherByCity(city) {
@@ -53,20 +55,50 @@ export async function getWeatherByCity(city) {
   };
 }
 
+// Function to fetch weather data based on coordinates - current location - reverse geocoding to get city name
 export async function getWeatherByCoords(latitude, longitude) {
-  const weatherResponse = await fetch(
-    `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
-  );
+  const [weatherResponse, locationResponse] = await Promise.all([
+    fetch(
+      `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+    ),
+    fetch(
+      `${REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=jsonv2&addressdetails=1`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    ),
+  ]);
 
   if (!weatherResponse.ok) {
-    throw new Error("Failed to fetch weather data for your location.");
+    throw new Error("Failed to fetch weather data for your current location.");
+  }
+
+  if (!locationResponse.ok) {
+    throw new Error("Failed to fetch location name for your current location.");
   }
 
   const weatherData = await weatherResponse.json();
-  console.table(weatherData);
+  const locationData = await locationResponse.json();
+
+  const address = locationData.address || {};
+
+  const cityName =
+    address.city ||
+    address.town ||
+    address.village ||
+    address.suburb ||
+    address.county ||
+    "Unknown location";
+
+  const countryName = address.country || "";
+
+  console.log(JSON.stringify(locationData, null, 2));
+
   return {
-    city: weatherData.city ?? "Unknown location",
-    country: "",
+    city: cityName,
+    country: countryName,
     temperature: weatherData.current?.temperature_2m ?? "N/A",
     humidity: weatherData.current?.relative_humidity_2m ?? "N/A",
     windSpeed: weatherData.current?.wind_speed_10m ?? "N/A",
@@ -111,14 +143,14 @@ export function getWeatherCondition(weatherCode) {
 
 // function to get a weather icon based on the weather code //Weather variable documentation
 export function getWeatherIcon(weatherCode) {
-  if (weatherCode === 0) return '☀️'
-  if ([1, 2].includes(weatherCode)) return '🌤️'
-  if (weatherCode === 3) return '☁️'
-  if ([45, 48].includes(weatherCode)) return '🌫️'
-  if ([51, 53, 55, 56, 57].includes(weatherCode)) return '🌦️'
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) return '🌧️'
-  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return '❄️'
-  if ([95, 96, 99].includes(weatherCode)) return '⛈️'
+  if (weatherCode === 0) return "☀️";
+  if ([1, 2].includes(weatherCode)) return "🌤️";
+  if (weatherCode === 3) return "☁️";
+  if ([45, 48].includes(weatherCode)) return "🌫️";
+  if ([51, 53, 55, 56, 57].includes(weatherCode)) return "🌦️";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) return "🌧️";
+  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return "❄️";
+  if ([95, 96, 99].includes(weatherCode)) return "⛈️";
 
-  return '🌍'
+  return "🌍";
 }
