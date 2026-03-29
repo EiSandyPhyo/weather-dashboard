@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getWeatherByCity } from "./api";
 import "./App.css";
 
@@ -9,6 +9,13 @@ function App() {
   const [errorMsg, setErrorMsg] = useState("");
   const [weather, setWeather] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+
+  useEffect(() => {
+    const savedFavorites =
+      JSON.parse(localStorage.getItem("favoriteCities")) || [];
+    setFavorites(savedFavorites);
+  }, []);
 
   const handleSearch = async () => {
     const trimmedCity = city.trim(); //to remove leading and trailing whitespace
@@ -69,6 +76,41 @@ function App() {
     }
   };
 
+  // Handle adding the current city to favorites
+  const handleAddFavorite = () => {
+    const cityName = weather.city;
+
+    const alreadyExists = favorites.includes(cityName); //check duplicate city
+
+    if (alreadyExists) {
+      setMessage(`${cityName} is already in favorite lists.`);
+      return;
+    }
+
+    const updatedFavorites = [...favorites, cityName];
+    setFavorites(updatedFavorites);
+    localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
+    setMessage(`${cityName} added to favorite lists.`);
+  };
+
+  // Handle removing a city from favorites
+  const handleRemoveFavorite = (cityToRemove) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to remove "${cityToRemove}" from favorite lists?`,
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    const updatedFavorites = favorites.filter((city) => city !== cityToRemove); //remove only the clicked city from the favorites list
+
+    setFavorites(updatedFavorites);
+    localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
+
+    setMessage(`${cityToRemove} is removed from favorite lists.`);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-sky-100 px-4 py-10">
@@ -123,32 +165,42 @@ function App() {
             <h2 className="mb-4 text-2xl font-semibold text-sky-800">
               Weather Information
             </h2>
+
             {weather ? (
-              <div className="space-y-2 text-gray-700">
-                <p>
-                  <span className="font-medium">City:</span> {weather.city}
-                </p>
-                <p>
-                  <span className="font-medium">Country:</span>{" "}
-                  {weather.country}
-                </p>
-                <p>
-                  <span className="font-medium">Temperature:</span>{" "}
-                  {weather.temperature}°C
-                </p>
-                <p>
-                  <span className="font-medium">Condition:</span>{" "}
-                  {weather.condition}
-                </p>
-                <p>
-                  <span className="font-medium">Humidity:</span>{" "}
-                  {weather.humidity}%
-                </p>
-                <p>
-                  <span className="font-medium">Wind Speed:</span>{" "}
-                  {weather.windSpeed} km/h
-                </p>
-              </div>
+              <>
+                <div className="space-y-2 text-gray-700">
+                  <p>
+                    <span className="font-medium">City:</span> {weather.city}
+                  </p>
+                  <p>
+                    <span className="font-medium">Country:</span>{" "}
+                    {weather.country}
+                  </p>
+                  <p>
+                    <span className="font-medium">Temperature:</span>{" "}
+                    {weather.temperature}°C
+                  </p>
+                  <p>
+                    <span className="font-medium">Condition:</span>{" "}
+                    {weather.condition}
+                  </p>
+                  <p>
+                    <span className="font-medium">Humidity:</span>{" "}
+                    {weather.humidity}%
+                  </p>
+                  <p>
+                    <span className="font-medium">Wind Speed:</span>{" "}
+                    {weather.windSpeed} km/h
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddFavorite}
+                  className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+                >
+                  Add to Favorites
+                </button>
+              </>
             ) : (
               <p className="text-gray-500">
                 No weather data yet. Search for a city.
@@ -160,9 +212,27 @@ function App() {
             <h2 className="mb-4 text-2xl font-semibold text-sky-800 capitalize">
               favorite cities
             </h2>
-            <ul className="space-y-2 text-gray-700">
-              <li>No favorite cities yet.</li>
-            </ul>
+            {favorites.length > 0 ? (
+              <ul className="space-y-2 text-gray-700">
+                {favorites.map((favoriteCity, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center justify-between rounded-lg bg-sky-50 px-3 py-2"
+                  >
+                    <span>{favoriteCity}</span>
+
+                    <button
+                      onClick={() => handleRemoveFavorite(favoriteCity)}
+                      className="rounded-md bg-red-500 px-3 py-1 text-sm text-white cursor-pointer hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No favorite cities yet.</p>
+            )}
           </div>
         </div>
       </div>
