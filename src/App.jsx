@@ -75,6 +75,8 @@ function App() {
 
     if (alreadyExists) {
       setMessage(`${cityName} is already in favorite lists.`);
+      setCity("");
+      setWeather(null);
       return;
     }
 
@@ -82,6 +84,8 @@ function App() {
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
     setMessage(`${cityName} added to favorite lists.`);
+    setCity("");
+    setWeather(null);
   };
 
   // Handle removing a city from favorites
