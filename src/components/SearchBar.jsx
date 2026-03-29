@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
+import searchLocationIcon from "../assets/search-location.png";
+import locationIcon from "../assets/location.png";
 
 const SearchBar = ({
   city,
@@ -12,7 +14,7 @@ const SearchBar = ({
 }) => {
   return (
     <div className="mb-6 rounded-2xl bg-white p-4 shadow-md">
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Enter city name..."
@@ -31,24 +33,42 @@ const SearchBar = ({
           type="button"
           onClick={() => handleSearch(city)}
           disabled={isLoading}
-          className={`rounded-xl px-5 py-3 font-medium text-white transition ${
-            isLoading
-              ? "cursor-not-allowed bg-sky-400"
-              : "cursor-pointer bg-sky-600 hover:bg-sky-700"
-          }
+          className={`${isLoading ? "cursor-not-allowed " : "cursor-pointer"}
           `}
         >
-          {isLoading ? "Loading..." : "Search"}
+          <span className="sm:hidden">
+            <img
+              src={searchLocationIcon}
+              alt="search location"
+              className="w-10 h-10 my-auto cursor-pointer ml-1"
+            />
+          </span>
+          <span
+            className={`hidden sm:inline rounded-xl px-5 py-3 font-medium text-white transition ${
+              isLoading
+                ? "cursor-not-allowed bg-sky-400"
+                : "cursor-pointer bg-sky-600 hover:bg-sky-700"
+            }
+          `}
+          >
+            {isLoading ? "Loading..." : "Search"}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleUseCurrentLocation}
+          disabled={isLoading}
+          className=""
+        >
+          <img
+            src={locationIcon}
+            alt="location"
+            className="w-10 h-10 my-auto cursor-pointer"
+          />
         </button>
       </div>
-      <button
-        type="button"
-        onClick={handleUseCurrentLocation}
-        disabled={isLoading}
-        className="rounded-xl bg-emerald-600 px-5 py-3 font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
-      >
-        Use My Location
-      </button>
+
       <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
     </div>
   );

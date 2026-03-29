@@ -56,9 +56,7 @@ function App() {
 
       setWeather(weatherData);
       setCity(weatherData.city); // display the city name by clicking the favorite city button
-      setMessage(
-        `Weather data loaded for "${weatherData.city}". Check console for details.`,
-      );
+      setMessage(`Weather data loaded for "${weatherData.city}".`);
     } catch (error) {
       setWeather(null);
       setMessage(
