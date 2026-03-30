@@ -2,9 +2,10 @@
 import React from "react";
 import { getWeatherCondition, getWeatherIcon } from "../api";
 import CityClock from "./CityClock";
-import calendarIcon from "../assets/calendar.png";
+import calendarIcon from "../assets/calendar_dark.png";
+import calendarIcon2 from "../assets/calendar_white.png";
 
-const ForecastSection = ({ forecast, weather }) => {
+const ForecastSection = ({ forecast, weather, currentTheme }) => {
   const formatDay = (dateString, index) => {
     if (index === 0) return "Today";
 
@@ -55,25 +56,39 @@ const ForecastSection = ({ forecast, weather }) => {
       </div>
     </div> */}
 
-      <div className="my-6 rounded-3xl bg-linear-to-br from-sky-100 to-blue-200 p-6 shadow-lg">
+      <div
+        className={`my-6 rounded-3xl p-6 shadow-lg transition-colors duration-500 ${
+          currentTheme === "day"
+            ? "bg-linear-to-br from-sky-100 to-blue-200"
+            : "bg-linear-to-br from-slate-800 to-indigo-950"
+        }`}
+      >
         {/* Header */}
         <div className="mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div className="flex items-center gap-2">
             <img
-              src={calendarIcon}
+              src={currentTheme === "day" ? calendarIcon : calendarIcon2}
               alt="Calendar"
               className="inline-block w-5 h-5 "
             />
 
-            <h2 className="text-2xl font-bold text-sky-900">5-Day Forecast</h2>
+            <h2
+              className={`text-2xl font-bold ${currentTheme === "day" ? "text-sky-900" : "text-white"}`}
+            >
+              5-Day Forecast
+            </h2>
           </div>
 
           <div className="">
-            <span className="text-sm text-gray-600">
+            <span
+              className={`text-sm ${currentTheme === "day" ? "text-gray-600" : "text-slate-300"}`}
+            >
               Updated: {forecast[0].date}
             </span>
 
-            <span className="text-sm text-gray-600">
+            <span
+              className={`text-sm ${currentTheme === "day" ? "text-gray-600" : "text-slate-300"}`}
+            >
               <CityClock timezone={weather?.timezone} />
             </span>
           </div>
@@ -84,9 +99,11 @@ const ForecastSection = ({ forecast, weather }) => {
           {forecast.map((day, index) => (
             <div
               key={day.date}
-              className="min-w-[120px] flex-shrink-0 rounded-2xl bg-white/60 p-4 text-center backdrop-blur-md shadow-md"
+              className={`min-w-[120px] flex-shrink-0 rounded-2xl  p-4 text-center backdrop-blur-md shadow-md ${currentTheme === "day" ? "bg-white/60" : "bg-slate-700/60"}`}
             >
-              <p className="text-sm font-semibold text-sky-800">
+              <p
+                className={`text-sm font-semibold ${currentTheme === "day" ? "text-sky-800" : "text-cyan-200"}`}
+              >
                 {formatDay(day.date, index)}
               </p>
 
@@ -94,15 +111,23 @@ const ForecastSection = ({ forecast, weather }) => {
                 {getWeatherIcon(day.weatherCode)}
               </div>
 
-              <p className="text-xs text-gray-600">
+              <p
+                className={`text-xs ${currentTheme === "day" ? "text-gray-600" : "text-slate-300"}`}
+              >
                 {getWeatherCondition(day.weatherCode)}
               </p>
 
-              <p className="mt-2 text-xl font-bold text-sky-900">
+              <p
+                className={`mt-2 text-xl font-bold ${currentTheme === "day" ? "text-sky-900" : "text-white"}`}
+              >
                 {Math.floor(day.maxTemp)}°C
               </p>
 
-              <p className="text-xs text-gray-500">Min: {Math.floor(day.minTemp)}°C</p>
+              <p
+                className={`text-xs ${currentTheme === "day" ? "text-gray-500" : "text-slate-300"}`}
+              >
+                Min: {Math.floor(day.minTemp)}°C
+              </p>
             </div>
           ))}
         </div>

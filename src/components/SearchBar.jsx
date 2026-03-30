@@ -11,9 +11,14 @@ const SearchBar = ({
   handleUseCurrentLocation,
   isLoading,
   errorMsg,
+  currentTheme,
 }) => {
   return (
-    <div className="mb-6 rounded-2xl bg-white p-4 shadow-md">
+    <div
+      className={`mb-6 rounded-2xl p-4 shadow-md transition-colors duration-500 ${
+        currentTheme === "day" ? "bg-white" : "bg-slate-800"
+      }`}
+    >
       <div className="flex items-center gap-2">
         <input
           type="text"
@@ -22,10 +27,12 @@ const SearchBar = ({
           onChange={(e) => setCity(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          className={`flex-1 rounded-xl border px-4 py-3 outline-none  ${
+          className={`flex-1 rounded-xl border px-4 py-3 outline-none ${
             isLoading
-              ? "bg-gray-100 cursor-not-allowed text-gray-400"
-              : "border-sky-200 focus:border-sky-500"
+              ? "cursor-not-allowed bg-gray-100 text-gray-400"
+              : currentTheme === "day"
+                ? "border-sky-200 focus:border-sky-500"
+                : "border-slate-600 bg-slate-700 text-white placeholder:text-slate-300 focus:border-cyan-400"
           }`}
         />
 
@@ -69,7 +76,11 @@ const SearchBar = ({
         </button>
       </div>
 
-      <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
+      <p
+        className={`text-sm mt-2  ${currentTheme === "day" ? "text-red-400" : "text-red-300"}`}
+      >
+        {errorMsg}
+      </p>
     </div>
   );
 };

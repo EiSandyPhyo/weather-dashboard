@@ -1,9 +1,22 @@
 import React from "react";
 
-const FavoriteLists = ({ favorites, handleSearch, handleRemoveFavorite }) => {
+const FavoriteLists = ({
+  favorites,
+  handleSearch,
+  handleRemoveFavorite,
+  currentTheme,
+}) => {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-md">
-      <h2 className="mb-4 text-2xl font-semibold text-sky-800 capitalize">
+    <div
+      className={`rounded-2xl p-6 shadow-md transition-colors duration-500 ${
+        currentTheme === "day" ? "bg-white" : "bg-slate-800"
+      }`}
+    >
+      <h2
+        className={`mb-4 text-2xl font-semibold capitalize ${
+          currentTheme === "day" ? "text-sky-800" : "text-white"
+        }`}
+      >
         favorite cities
       </h2>
       {favorites.length > 0 ? (
@@ -11,12 +24,20 @@ const FavoriteLists = ({ favorites, handleSearch, handleRemoveFavorite }) => {
           {favorites.map((favoriteCity, index) => (
             <li
               key={index}
-              className="flex items-center justify-between rounded-lg bg-sky-50 px-3 py-2 hover:bg-sky-100 transition"
+              className={`flex items-center justify-between rounded-lg px-3 py-2 transition ${
+                currentTheme === "day"
+                  ? "bg-sky-50 hover:bg-sky-100"
+                  : "bg-slate-700 hover:bg-slate-600"
+              }`}
             >
               <button
                 type="button"
                 onClick={() => handleSearch(favoriteCity)}
-                className="text-left font-medium text-sky-700 hover:italic cursor-pointer hover:text-sky-800 hover:text-xl transition-all"
+                className={`cursor-pointer text-left font-medium transition-all hover:italic ${
+                  currentTheme === "day"
+                    ? "text-sky-700 hover:text-sky-800 hover:text-xl"
+                    : "text-white hover:text-white hover:text-xl"
+                }`}
               >
                 {favoriteCity}
               </button>
@@ -31,7 +52,13 @@ const FavoriteLists = ({ favorites, handleSearch, handleRemoveFavorite }) => {
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500">No favorite cities yet.</p>
+        <p
+          className={
+            currentTheme === "day" ? "text-gray-500" : "text-slate-300"
+          }
+        >
+          No favorite cities yet. Add some!
+        </p>
       )}
     </div>
   );

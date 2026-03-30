@@ -2,11 +2,15 @@
 import React from "react";
 import { getWeatherIcon } from "../api";
 
-const WeatherCard = ({ weather, handleAddFavorite }) => {
+const WeatherCard = ({ weather, handleAddFavorite, currentTheme }) => {
   return (
-    <div className="mb-6 rounded-3xl bg-white p-6 shadow-lg">
+    <div
+      className={`mb-6 rounded-3xl p-6 shadow-lg transition-colors duration-500 ${currentTheme === "day" ? "bg-white" : "bg-slate-800"}`}
+    >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold text-sky-800">
+        <h2
+          className={`text-2xl font-semibold  ${currentTheme === "day" ? "text-sky-800" : "text-white "}`}
+        >
           Weather Information
         </h2>
 
@@ -22,11 +26,18 @@ const WeatherCard = ({ weather, handleAddFavorite }) => {
 
       {weather ? (
         <div className="space-y-5">
-          <div className="rounded-3xl bg-linear-to-r from-sky-500 to-cyan-400 p-5 text-white">
+          <div
+            className={`rounded-3xl p-5 text-white ${
+              currentTheme === "day"
+                ? "bg-linear-to-r from-sky-500 to-cyan-400"
+                : "bg-linear-to-r from-slate-700 to-indigo-900"
+            }`}
+          >
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-lg font-semibold">
-                  {weather.city}{weather.country ? `, ${weather.country}` : ''}
+                  {weather.city}
+                  {weather.country ? `, ${weather.country}` : ""}
                 </p>
 
                 <p className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
@@ -45,16 +56,36 @@ const WeatherCard = ({ weather, handleAddFavorite }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl bg-sky-50 p-4">
-              <p className="text-sm font-medium text-sky-700">Humidity</p>
-              <p className="mt-2 text-2xl font-bold text-sky-900">
+            <div
+              className={`rounded-2xl p-4 ${
+                currentTheme === "day" ? "bg-sky-50" : "bg-slate-700"
+              }`}
+            >
+              <p
+                className={`text-sm font-medium ${currentTheme === "day" ? "text-sky-700" : "text-slate-200"}`}
+              >
+                Humidity
+              </p>
+              <p
+                className={`mt-2 text-2xl font-bold ${currentTheme === "day" ? "text-sky-900" : "text-white"}`}
+              >
                 {weather.humidity}%
               </p>
             </div>
 
-            <div className="rounded-2xl bg-sky-50 p-4">
-              <p className="text-sm font-medium text-sky-700">Wind Speed</p>
-              <p className="mt-2 text-2xl font-bold text-sky-900">
+            <div
+              className={`rounded-2xl p-4 ${
+                currentTheme === "day" ? "bg-sky-50" : "bg-slate-700"
+              }`}
+            >
+              <p
+                className={`text-sm font-medium ${currentTheme === "day" ? "text-sky-700" : "text-slate-200"}`}
+              >
+                Wind Speed
+              </p>
+              <p
+                className={`mt-2 text-2xl font-bold ${currentTheme === "day" ? "text-sky-900" : "text-white"}`}
+              >
                 {weather.windSpeed} km/h
               </p>
             </div>

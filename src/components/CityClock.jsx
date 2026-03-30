@@ -8,7 +8,7 @@ const CityClock = ({ timezone }) => {
     if (!timezone) return;
 
     const updateTime = () => {
-      const formattedTime = new Intl.DateTimeFormat("en-GB", {
+      const formattedTime = new Intl.DateTimeFormat("en-GB", { //gets the current hour for that city’s timezone
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",

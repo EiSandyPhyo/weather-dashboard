@@ -171,6 +171,27 @@ function App() {
     );
   };
 
+  // Determine theme based on timezone for dynamic styling
+  const getThemeByTimezone = (timezone) => {
+    if (!timezone) return "day";
+
+    const hour = Number(
+      new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        hour12: false,
+        timeZone: timezone,
+      }).format(new Date()),
+    );
+
+    console.log("what time is it?  " + hour + "  in " + timezone);
+
+    if (hour >= 6 && hour < 18) {
+      return "day";
+    }
+
+    return "night";
+  };
+
   // Handle "Enter" key press in the input field to trigger search
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !isLoading) {
@@ -178,11 +199,18 @@ function App() {
     }
   };
 
+  const currentTheme = getThemeByTimezone(weather?.timezone);
+  console.log("this is from app.jsx --- " + currentTheme);
+
   return (
     <>
-      <div className="min-h-screen bg-sky-100 px-4 py-10">
+      <div
+        className={`min-h-screen px-4 py-10 transition-colors duration-500 ${currentTheme === "day" ? "bg-sky-100" : "bg-slate-900 text-white"}`}
+      >
         <div className="mx-auto max-w-2xl">
-          <h1 className="mb-8 text-center text-3xl md:text-4xl lg:text-5xl font-bold text-sky-800 capitalize">
+          <h1
+            className={`mb-8 text-center text-3xl md:text-4xl lg:text-5xl font-bold text-sky-800 capitalize ${currentTheme === "day" ? "text-sky-800" : " text-white"}`}
+          >
             weather dashboard
           </h1>
 
@@ -194,6 +222,7 @@ function App() {
             isLoading={isLoading}
             errorMsg={errorMsg}
             handleUseCurrentLocation={handleUseCurrentLocation}
+            currentTheme={currentTheme}
           />
 
           {/* <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
@@ -201,7 +230,9 @@ function App() {
           </div> */}
 
           {message && (
-            <div className="mb-6 rounded-xl bg-white p-4 text-sm font-medium text-sky-700 shadow-md">
+            <div
+              className={`mb-6 rounded-xl p-4 text-sm font-medium shadow-md ${currentTheme === "day" ? "bg-white text-sky-700" : "bg-slate-800 text-white"}`}
+            >
               {message}
             </div>
           )}
@@ -209,14 +240,20 @@ function App() {
           <WeatherCard
             weather={weather}
             handleAddFavorite={handleAddFavorite}
+            currentTheme={currentTheme}
           />
 
-          <ForecastSection forecast={weather?.forecast} weather={weather} />
+          <ForecastSection
+            forecast={weather?.forecast}
+            weather={weather}
+            currentTheme={currentTheme}
+          />
 
           <FavoriteLists
             favorites={favorites}
             handleSearch={handleSearch}
             handleRemoveFavorite={handleRemoveFavorite}
+            currentTheme={currentTheme}
           />
         </div>
       </div>
