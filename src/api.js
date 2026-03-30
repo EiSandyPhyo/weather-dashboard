@@ -36,7 +36,7 @@ export async function getWeatherByCity(city) {
   console.log("Geocoding result from api.js:", location); // Log the geocoding result for debugging
 
   const weatherResponse = await fetch(
-    `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+    `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=5&timezone=auto`
   );
 
   if (!weatherResponse.ok) {
@@ -52,6 +52,13 @@ export async function getWeatherByCity(city) {
     humidity: weatherData.current?.relative_humidity_2m ?? "N/A",
     windSpeed: weatherData.current?.wind_speed_10m ?? "N/A",
     weatherCode: weatherData.current?.weather_code ?? null,
+    timezone: weatherData.timezone ?? '',
+    forecast: weatherData.daily?.time.map((date, index) => ({
+      date,
+      weatherCode: weatherData.daily?.weather_code[index] ?? null,
+      maxTemp: weatherData.daily?.temperature_2m_max[index] ?? "N/A",
+      minTemp: weatherData.daily?.temperature_2m_min[index] ?? "N/A",
+    })) ?? [],
   };
 }
 
@@ -59,7 +66,7 @@ export async function getWeatherByCity(city) {
 export async function getWeatherByCoords(latitude, longitude) {
   const [weatherResponse, locationResponse] = await Promise.all([
     fetch(
-      `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+      `${WEATHER_BASE_URL}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=5&timezone=auto`,
     ),
     fetch(
       `${REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=jsonv2&addressdetails=1`,
@@ -103,6 +110,13 @@ export async function getWeatherByCoords(latitude, longitude) {
     humidity: weatherData.current?.relative_humidity_2m ?? "N/A",
     windSpeed: weatherData.current?.wind_speed_10m ?? "N/A",
     weatherCode: weatherData.current?.weather_code ?? null,
+    timezone: weatherData.timezone ?? '',
+    forecast: weatherData.daily?.time.map((date, index) => ({
+      date,
+      weatherCode: weatherData.daily?.weather_code[index] ?? null,
+      maxTemp: weatherData.daily?.temperature_2m_max[index] ?? "N/A",
+      minTemp: weatherData.daily?.temperature_2m_min[index] ?? "N/A",
+    })) ?? [],
   };
 }
 

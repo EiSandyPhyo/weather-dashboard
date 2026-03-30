@@ -34,7 +34,7 @@ const WeatherCard = ({ weather, handleAddFavorite }) => {
                 </p>
 
                 <p className="mt-4 text-5xl font-bold">
-                  {weather.temperature}°C
+                  {Math.round(weather.temperature)}°
                 </p>
               </div>
 

@@ -8,6 +8,7 @@ import {
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
 import FavoriteLists from "./components/FavoriteLists";
+import ForecastSection from "./components/ForecastSection";
 
 function App() {
   const [city, setCity] = useState("");
@@ -50,6 +51,8 @@ function App() {
         humidity: data.humidity ?? "N/A",
         windSpeed: data.windSpeed ?? "N/A",
         weatherCode: data.weatherCode ?? null,
+        timezone: data.timezone,
+        forecast: data.forecast || [],
       };
 
       console.log("Weather data:", weatherData);
@@ -131,6 +134,8 @@ function App() {
             humidity: data.humidity,
             windSpeed: data.windSpeed,
             weatherCode: data.weatherCode,
+            timezone: data.timezone,
+            forecast: data.forecast,
           };
           console.log(weatherData);
           setWeather(weatherData);
@@ -205,6 +210,8 @@ function App() {
             weather={weather}
             handleAddFavorite={handleAddFavorite}
           />
+
+          <ForecastSection forecast={weather?.forecast} weather={weather} />
 
           <FavoriteLists
             favorites={favorites}
