@@ -86,7 +86,7 @@ const WeatherCard = ({ weather, handleAddFavorite, currentTheme }) => {
               <p
                 className={`mt-2 text-2xl font-bold ${currentTheme === "day" ? "text-sky-900" : "text-white"}`}
               >
-                {weather.windSpeed} km/h
+                {Math.round(weather.windSpeed)} km/h
               </p>
             </div>
           </div>
