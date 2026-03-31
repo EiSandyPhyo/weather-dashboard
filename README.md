@@ -1,17 +1,88 @@
-# React + Vite
+# 🌤️ Weather Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and responsive **Weather Dashboard** built with **React, Vite, and Tailwind CSS**, using real-time data from the **Open-Meteo API**.
 
-Currently, two official plugins are available:
+This application allows users to search for weather by city, detect their current location, view a 5-day forecast, and manage favourite cities — all with a clean and dynamic UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🔗 Live Demo
+*(Add your deployed link here later)*  
+👉 https://your-app-link.vercel.app
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🚀 Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# weather-dashboard
+- 🔍 Search weather by city name  
+- 📍 Detect current location automatically  
+- 🌡️ Display current weather (temperature, wind, humidity)  
+- 📅 5-day weather forecast  
+- ⭐ Add and remove favourite cities  
+- 💾 Persistent data using localStorage  
+- 🌙 Dynamic Day/Night theme (based on timezone)  
+- 🎨 Dynamic background based on weather conditions  
+- ⏱️ Local time display for searched city  
+- 📱 Fully responsive design (mobile + desktop)  
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS
+- JavaScript (ES6)
+  
+### APIs
+  - [Open-Meteo](https://open-meteo.com/en/docs) (Weather Forecast & Geocoding)
+  - Nominatim (reverse geocoding)
+### Browser APIs
+  - Geolocation API  
+  - Local Storage  
+
+---
+
+## 📚 What I Learned
+- API integration and async data handling
+- React state management and component design
+- Conditional rendering and dynamic UI
+- Local storage usage
+- Geolocation handling
+- Timezone-based logic
+- Responsive UI design with Tailwind
+
+---
+
+## 🔮 Future Improvements
+- 📊 Hourly weather chart (D3.js integration)
+- 🎨 Improved animations and transitions
+
+---
+
+## 📦 Installation (Local Setup)
+
+### Clone the repository:
+```bash
+git clone https://github.com/your-username/weather-dashboard.git
+```
+
+### Navigate to the project:
+```bash
+cd weather-dashboard
+```
+
+### Install dependencies:
+```bash
+npm install
+```
+
+### Run the app:
+```bash
+npm run dev
+```
+
+---
+
+## 👤 Author
+[Sandy](https://github.com/EiSandyPhyo)
