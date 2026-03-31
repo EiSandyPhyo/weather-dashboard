@@ -17,6 +17,7 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [messageType, setMessageType] = useState("info");
 
   useEffect(() => {
     const savedFavorites =
@@ -75,6 +76,7 @@ function App() {
       setWeather(weatherData);
       setCity(weatherData.city); // display the city name by clicking the favorite city button
       setMessage(`Weather data loaded for "${weatherData.city}".`);
+      setMessageType("loaded");
 
       if (shouldScrollToTop) {
         setTimeout(() => {
@@ -89,6 +91,7 @@ function App() {
       setMessage(
         error.message || "Something went wrong while fetching weather data.",
       );
+      setMessageType("error");
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +104,8 @@ function App() {
     const alreadyExists = favorites.includes(cityName); //check duplicate city
 
     if (alreadyExists) {
-      setMessage(`${cityName} is already in favorite lists.`);
+      setMessage(`"${cityName}" is already in favorite lists.`);
+      setMessageType("duplicate");
       setCity("");
       setWeather(null);
       return;
@@ -110,7 +114,8 @@ function App() {
     const updatedFavorites = [...favorites, cityName]; //add the new city to the existing favorites list
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
-    setMessage(`${cityName} added to favorite lists.`);
+    setMessage(`"${cityName}" is added to favorite lists.`);
+    setMessageType("success");
     setCity("");
     setWeather(null);
 
@@ -136,7 +141,8 @@ function App() {
 
     setFavorites(updatedFavorites);
     localStorage.setItem("favoriteCities", JSON.stringify(updatedFavorites));
-    setMessage(`${cityToRemove} is removed from favorite lists.`);
+    setMessage(`"${cityToRemove}" is removed from favorite lists.`);
+    setMessageType("delete");
     setCity("");
     setWeather(null);
 
@@ -152,11 +158,13 @@ function App() {
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
       setMessage("Geolocation is not supported by your browser.");
+      setMessageType("info");
       return;
     }
 
     setIsLoading(true);
     setMessage("Getting your current location...");
+    setMessageType("info");
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -179,11 +187,13 @@ function App() {
           setWeather(weatherData);
           setCity(weatherData.city.replace("City of ", "")); // display the city name by clicking the current location button
           setMessage("Weather data loaded for your current location.");
+          setMessageType("loaded");
         } catch (error) {
           setWeather(null);
           setMessage(
             error.message || "Failed to fetch weather for your location.",
           );
+          setMessageType("error");
         } finally {
           setIsLoading(false);
         }
@@ -193,12 +203,16 @@ function App() {
 
         if (error.code === 1) {
           setMessage("Location permission was denied.");
+          setMessageType("error");
         } else if (error.code === 2) {
           setMessage("Unable to detect your location.");
+          setMessageType("error");
         } else if (error.code === 3) {
           setMessage("Location request timed out.");
+          setMessageType("error");
         } else {
           setMessage("Failed to get your location.");
+          setMessageType("error");
         }
       },
       {
@@ -240,6 +254,66 @@ function App() {
   const currentTheme = getThemeByTimezone(weather?.timezone);
   console.log("this is from app.jsx --- " + currentTheme);
 
+  const getMessageConfig = () => {
+    if (messageType === "success") {
+      return {
+        bg: currentTheme === "day" ? "bg-green-50" : "bg-green-900/30",
+        text: currentTheme === "day" ? "text-green-700" : "text-green-200",
+        border: "border-l-4 border-green-500",
+        icon: "✅",
+        title: "Success",
+      };
+    }
+
+    if (messageType === "loaded") {
+      return {
+        bg: currentTheme === "day" ? "bg-green-50" : "bg-green-900/30",
+        text: currentTheme === "day" ? "text-green-700" : "text-green-200",
+        border: "border-l-4 border-green-500",
+        icon: "✔️",
+        title: "Loaded",
+      };
+    }
+
+    if (messageType === "error") {
+      return {
+        bg: currentTheme === "day" ? "bg-yellow-50" : "bg-yellow-900/30",
+        text: currentTheme === "day" ? "text-yellow-700" : "text-yellow-200",
+        border: "border-l-4 border-yellow-500",
+        icon: "⚠️",
+        title: "Error",
+      };
+    }
+
+    if (messageType === "delete") {
+      return {
+        bg: currentTheme === "day" ? "bg-red-50" : "bg-red-900/30",
+        text: currentTheme === "day" ? "text-red-700" : "text-red-200",
+        border: "border-l-4 border-red-500",
+        icon: "❌",
+        title: "Removed",
+      };
+    }
+
+    if (messageType === "duplicate") {
+      return {
+        bg: currentTheme === "day" ? "bg-red-50" : "bg-red-900/30",
+        text: currentTheme === "day" ? "text-red-700" : "text-red-200",
+        border: "border-l-4 border-red-500",
+        icon: "🚫",
+        title: "Duplicate",
+      };
+    }
+
+    return {
+      bg: currentTheme === "day" ? "bg-blue-50" : "bg-slate-800",
+      text: currentTheme === "day" ? "text-blue-700" : "text-white",
+      border: "border-l-4 border-blue-500",
+      icon: "ℹ️",
+      title: "Info",
+    };
+  };
+
   return (
     <>
       <div
@@ -263,17 +337,19 @@ function App() {
             currentTheme={currentTheme}
           />
 
-          {/* <div className="mb-4 rounded-xl bg-sky-50 p-3 text-sm text-sky-800">
-            Current input: {city || "Nothing typed yet"}
-          </div> */}
+          {message &&
+            (() => {
+              const config = getMessageConfig();
 
-          {message && (
-            <div
-              className={`mb-6 rounded-xl p-4 text-sm font-medium shadow-md ${currentTheme === "day" ? "bg-white text-sky-700" : "bg-slate-800 text-white"}`}
-            >
-              {message}
-            </div>
-          )}
+              return (
+                <div
+                  className={`mb-6 flex items-center gap-3 rounded-xl p-4 shadow-md ${config.bg} ${config.text} ${config.border}`}
+                >
+                  <p className="text-xl">{config.icon}</p>
+                  <p className="text-sm opacity-80">{message}</p>
+                </div>
+              );
+            })()}
 
           <WeatherCard
             weather={weather}
