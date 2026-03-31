@@ -7,8 +7,7 @@ This application allows users to search for weather by city, detect their curren
 ---
 
 ## 🔗 Live Demo
-*(Add your deployed link here later)*  
-👉 https://your-app-link.vercel.app
+👉 https://weather-dashboard-opal-eight.vercel.app/
 
 ---
 
