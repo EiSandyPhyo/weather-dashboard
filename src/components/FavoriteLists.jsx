@@ -32,7 +32,7 @@ const FavoriteLists = ({
             >
               <button
                 type="button"
-                onClick={() => handleSearch(favoriteCity)}
+                onClick={() => handleSearch(favoriteCity, true)}
                 className={`cursor-pointer text-left font-medium transition-all hover:italic ${
                   currentTheme === "day"
                     ? "text-sky-700 hover:text-sky-800 hover:text-xl"

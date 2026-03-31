@@ -24,7 +24,22 @@ function App() {
     setFavorites(savedFavorites);
   }, []);
 
-  const handleSearch = async (searchCity) => {
+  // Get scroll offset based on screen size
+  const getScrollOffset = () => {
+    let scrollTop = 0;
+
+    if (window.innerWidth < 640) {
+      scrollTop = 20; // mobile
+    } else if (window.innerWidth < 1024) {
+      scrollTop = 0; // tablet
+    } else {
+      scrollTop = 100; // desktop
+    }
+
+    return scrollTop;
+  };
+
+  const handleSearch = async (searchCity, shouldScrollToTop = false) => {
     const trimmedCity = String(searchCity ?? city).trim(); //.trim to remove leading and trailing whitespace
 
     setMessage(""); // Clear any previous success messages
@@ -60,6 +75,15 @@ function App() {
       setWeather(weatherData);
       setCity(weatherData.city); // display the city name by clicking the favorite city button
       setMessage(`Weather data loaded for "${weatherData.city}".`);
+
+      if (shouldScrollToTop) {
+        setTimeout(() => {
+          window.scrollTo({
+            top: getScrollOffset(),
+            behavior: "smooth",
+          });
+        }, 100);
+      } //scroll to top of the page after clicking the favorite city button
     } catch (error) {
       setWeather(null);
       setMessage(
@@ -89,6 +113,13 @@ function App() {
     setMessage(`${cityName} added to favorite lists.`);
     setCity("");
     setWeather(null);
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
   };
 
   // Handle removing a city from favorites
@@ -108,6 +139,13 @@ function App() {
     setMessage(`${cityToRemove} is removed from favorite lists.`);
     setCity("");
     setWeather(null);
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 100);
   };
 
   // Handle fetching weather data for the user's current location
