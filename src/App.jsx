@@ -314,10 +314,103 @@ function App() {
     };
   };
 
+  // Determine background color based on weather conditions and theme
+  const getWeatherCategory = (code) => {
+    if (code === 0) return "clear";
+
+    if ([1, 2].includes(code)) return "partlyCloudy";
+
+    if (code === 3) return "cloudy";
+
+    if ([45, 48].includes(code)) return "fog";
+
+    if ([51, 53, 55, 56, 57].includes(code)) return "drizzle";
+
+    if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
+
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return "snow";
+
+    if ([95, 96, 99].includes(code)) return "storm";
+
+    return "default";
+  };
+
+  const getDynamicBackground = () => {
+    if (!weather) {
+      return "bg-sky-100"; // default before search
+    }
+
+    const category = getWeatherCategory(weather?.weatherCode);
+
+    //day theme
+    if (currentTheme === "day") {
+      switch (category) {
+        case "clear":
+          return "bg-gradient-to-br from-sky-300 via-cyan-200 to-blue-200";
+
+        case "partlyCloudy":
+          return "bg-gradient-to-br from-sky-200 via-slate-200 to-blue-200";
+
+        case "cloudy":
+          return "bg-gradient-to-br from-slate-300 via-slate-200 to-gray-300";
+
+        case "fog":
+          return "bg-gradient-to-br from-gray-300 via-slate-300 to-gray-400";
+
+        case "drizzle":
+          return "bg-gradient-to-br from-slate-400 via-blue-300 to-sky-300";
+
+        case "rain":
+          return "bg-gradient-to-br from-slate-500 via-blue-400 to-slate-400";
+
+        case "snow":
+          return "bg-gradient-to-br from-blue-100 via-slate-100 to-white";
+
+        case "storm":
+          return "bg-gradient-to-br from-slate-700 via-gray-600 to-slate-800";
+
+        default:
+          return "bg-gradient-to-br from-sky-200 to-blue-200";
+      }
+    }
+
+    //night theme
+    if (currentTheme === "night") {
+      switch (category) {
+        case "clear":
+          return "bg-gradient-to-br from-slate-900 via-indigo-900 to-blue-900";
+
+        case "partlyCloudy":
+          return "bg-gradient-to-br from-slate-800 via-indigo-900 to-slate-900";
+
+        case "cloudy":
+          return "bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900";
+
+        case "fog":
+          return "bg-gradient-to-br from-slate-700 via-gray-800 to-slate-900";
+
+        case "drizzle":
+          return "bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900";
+
+        case "rain":
+          return "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950";
+
+        case "snow":
+          return "bg-gradient-to-br from-slate-700 via-blue-800 to-slate-900";
+
+        case "storm":
+          return "bg-gradient-to-br from-black via-slate-900 to-indigo-950";
+
+        default:
+          return "bg-gradient-to-br from-slate-900 to-slate-800";
+      }
+    }
+  };
+
   return (
     <>
       <div
-        className={`min-h-screen px-4 py-10 transition-colors duration-500 ${currentTheme === "day" ? "bg-sky-100" : "bg-slate-900 text-white"}`}
+        className={`min-h-screen px-4 py-10 transition-colors duration-500 ${getDynamicBackground()}`}
       >
         <div className="mx-auto max-w-2xl">
           <h1
