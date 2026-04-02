@@ -63,7 +63,7 @@ This application allows users to search for weather by city, detect their curren
 
 ### Clone the repository:
 ```bash
-git clone https://github.com/your-username/weather-dashboard.git
+git clone https://github.com/EiSandyPhyo/weather-dashboard.git
 ```
 
 ### Navigate to the project:
